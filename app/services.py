@@ -10,10 +10,8 @@ load_dotenv()
 
 MODEL_PATH = os.getenv("MODEL_PATH", "models/best.pt")
 
-# Optimal image size for B1 - balances speed and accuracy
-# 480px maintains good accuracy while being faster than 640px
-# Works on B1 and scales up automatically with better plans
-IMG_SIZE = int(os.getenv("YOLO_IMG_SIZE", "480"))
+# Image size for inference - 640px is the standard YOLO input size for best accuracy
+IMG_SIZE = int(os.getenv("YOLO_IMG_SIZE", "640"))
 
 # Load model globally so it stays in memory (Fastest Inference)
 print(f"Loading YOLO Model from: {MODEL_PATH}...")
