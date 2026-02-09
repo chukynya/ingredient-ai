@@ -15,15 +15,19 @@ logger = logging.getLogger(__name__)
 MODEL_PATH = os.getenv("MODEL_PATH", "models/best.pt")
 IMG_SIZE = int(os.getenv("YOLO_IMG_SIZE", "640"))
 
+print(f"Loading YOLO model from: {MODEL_PATH}")
 logger.info("Loading YOLO model from: %s", MODEL_PATH)
 model = YOLO(MODEL_PATH)
 
 try:
     model.fuse()
+    print("✅ Model fused for faster inference")
     logger.info("Model fused for faster inference.")
 except Exception:
+    print("⚠️  Model fusion not available, using standard model")
     logger.info("Model fusion not available, using standard model.")
 
+print(f"✅ Model loaded successfully. Inference image size: {IMG_SIZE}px")
 logger.info("Model loaded. Inference image size: %dpx", IMG_SIZE)
 
 

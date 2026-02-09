@@ -8,11 +8,26 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routes import router
 from app.services import model
 
-if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
-    from azure.monitor.opentelemetry import configure_azure_monitor
-    configure_azure_monitor()
-
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
+
+# Initialize Application Insights telemetry
+if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
+    try:
+        from azure.monitor.opentelemetry import configure_azure_monitor
+        configure_azure_monitor()
+        print("✅ Application Insights telemetry initialized")
+        logger.info("Application Insights telemetry initialized")
+    except Exception as e:
+        print(f"❌ Failed to initialize Application Insights: {e}")
+        logger.error("Failed to initialize Application Insights: %s", e)
+else:
+    print("⚠️  APPLICATIONINSIGHTS_CONNECTION_STRING not set - telemetry disabled")
+    logger.warning("APPLICATIONINSIGHTS_CONNECTION_STRING not set - telemetry disabled")
 
 
 @asynccontextmanager
@@ -21,11 +36,14 @@ async def lifespan(app: FastAPI):
     try:
         import numpy as np
         from PIL import Image
+        print("Warming up YOLO model...")
         logger.info("Warming up model...")
         dummy_img = Image.fromarray(np.zeros((480, 480, 3), dtype=np.uint8))
         model.predict(dummy_img, imgsz=480, verbose=False)
+        print("✅ Model warmup complete - ready for inference")
         logger.info("Model warmup complete.")
     except Exception as e:
+        print(f"⚠️  Model warmup failed: {e}")
         logger.warning("Model warmup failed: %s", e)
     yield
 
@@ -33,7 +51,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Ingredient Detection API",
     description="YOLOv8-powered food ingredient detection service",
-    version="1.2.0",
+    version="1.2.1",
     lifespan=lifespan,
 )
 
