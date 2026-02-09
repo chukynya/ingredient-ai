@@ -21,6 +21,10 @@ ENV OMP_NUM_THREADS=2
 ENV MODEL_PATH=models/best.onnx
 ENV YOLO_IMG_SIZE=640
 
+# Disable Ultralytics phoning home to Google Analytics
+ENV YOLO_VERBOSE=false
+ENV HUB_DISABLED=true
+
 EXPOSE 80
 
 # 2 workers: each gets 2 CPU cores worth of threads for faster per-request inference

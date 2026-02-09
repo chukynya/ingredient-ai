@@ -7,11 +7,14 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 from opentelemetry import metrics
 from PIL import Image, UnidentifiedImageError
-from ultralytics import YOLO
+from ultralytics import YOLO, settings as yolo_settings
 
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+
+# Disable Ultralytics analytics (Google Analytics calls)
+yolo_settings.update({"sync": False})
 
 # Custom metric: tracks pure inference time (what you see in Postman locally)
 meter = metrics.get_meter("resepin-api")
